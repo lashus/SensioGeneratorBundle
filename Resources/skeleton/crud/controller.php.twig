@@ -5,13 +5,24 @@ namespace {{ namespace }}\Controller{{ entity_namespace ? '\\' ~ entity_namespac
 {% block use_statements %}
 {% if 'new' in actions or 'edit' in actions or 'delete' in actions %}
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 {%- endif %}
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
+
+use JMS\DiExtraBundle\Annotation\Inject;
+
 {% if 'annotation' == format -%}
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 {%- endif %}
 
 use {{ namespace }}\Entity\{{ entity }};
@@ -36,6 +47,47 @@ class {{ entity_class }}Controller extends Controller
 {% endblock class_definition %}
 {
 {% block class_body %}
+    
+    {% block injects %}
+        /**
+        * @Inject("doctrine.orm.entity_manager")
+        */
+        protected $em;
+
+        /**
+        * @Inject("security.acl.provider")
+        */
+        protected $acl;
+
+        /**
+        * @Inject("security.context")
+        */
+        protected $security;
+
+        /**
+         * @Inject("translator")
+         */
+        protected $translator;
+
+        /**
+         * @Inject("knp_paginator")
+         */
+        protected $paginator;
+
+        /**
+        * @Inject("notify")
+        */
+        protected $notify;
+
+        /**
+         * @Inject("white_october_breadcrumbs")
+         */
+        protected $breadcrumbs;
+
+        protected $pagination_limit = 50;
+        
+    {% endblock injects %}
+    
     {%- if 'index' in actions %}
         {%- include 'crud/actions/index.php.twig' %}
     {%- endif %}

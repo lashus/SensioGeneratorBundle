@@ -5,7 +5,7 @@
      *
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
-     * @Route("/", name="{{ route_name_prefix }}_create")
+     * @Route("/create", name="{{ route_name_prefix }}_create")
      * @Method("POST")
      * @Template("{{ bundle }}:{{ entity }}:new.html.twig")
 {% endif %}
@@ -21,9 +21,23 @@
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            
+            $this->em->persist($entity);
+            $this->em->flush();
+            
+            // creating the ACL
+            $objectIdentity = ObjectIdentity::fromDomainObject($entity);
+            $acl = $this->acl->createAcl($objectIdentity);
+
+            // retrieving the security identity of the currently logged-in user
+            $user = $this->security->getToken()->getUser();
+            $securityIdentity = UserSecurityIdentity::fromAccount($user);
+
+            // grant owner access
+            $acl->insertObjectAce($securityIdentity, MaskBuilder::MASK_OWNER);
+            $this->acl->updateAcl($acl);
+            
+            $this->notify->crud('ajax-success', 'add');
 
             {% if 'show' in actions -%}
                 return $this->redirect($this->generateUrl('{{ route_name_prefix }}_show', array('id' => $entity->getId())));
@@ -31,7 +45,14 @@
                 return $this->redirect($this->generateUrl('{{ route_name_prefix }}'));
             {%- endif %}
 
+        } else {
+            $this->notify->crud('ajax-error', 'add');
         }
+        
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.home", array(), 'messages'), $this->generateUrl("{{ route_name_prefix }}_home"));
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.CHANGE",  array(), 'CHANGE'), $this->generateUrl("{{ route_name_prefix }}_CHANGE"));
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.new",  array(), 'messages'), $this->generateUrl("{{ route_name_prefix }}_new"));
+        
 {% endblock method_body %}
 
 {% block method_return %}
@@ -64,7 +85,7 @@
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+        $form->add('submit', 'submit', array('label' => 'global.save'));
 
         return $form;
     }

@@ -4,11 +4,10 @@
 
 {% block body %}
 {{ "{% block body -%}" }}
-    <h1>{{ entity }} creation</h1>
+    <h1>{{ '\{\{' ~ route_name_prefix ~ '.new.title\|trans\}\}' }}</h1>
 
-    {{ '{{ form(form) }}' }}
+    {{ '\{\{ form(form) \}\}' }}
 
-    {% set hide_edit, hide_delete = true, true %}
-    {% include 'crud/views/others/record_actions.html.twig.twig' %}
+    {% set hide_edit, hide_delete = true, false %}
 {{ "{% endblock %}" }}
 {% endblock body %}

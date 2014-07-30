@@ -21,9 +21,46 @@ class {{ form_class }} extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        {%- for field in fields %}
+        {%- for field,metadata in fields %}
 
-            ->add('{{ field }}')
+            {% if metadata.type == 'text' %}
+            ->add('{{ field }}', 'textarea', array(
+                'label'=>'{{ route_name_prefix }}.form.{{ field }}',
+                'translation_domain'=>'{{ route_name_prefix }}',
+                'required'=>true
+            ))    
+            {% elseif metadata.type == 'integer' %}
+            ->add('{{ field }}', 'number', array(
+                'label'=>'{{ route_name_prefix }}.form.{{ field }}',
+                'translation_domain'=>'{{ route_name_prefix }}',
+                'required'=>true,
+                {% if field == 'phone' %}
+                'attr'=>array(
+                    'class'=>'phone'
+                )
+                {% endif %}
+            ))    
+            {% elseif metadata.type == 'boolean' %}
+            ->add('{{ field }}', 'checkbox', array(
+                'label'=>'{{ route_name_prefix }}.form.{{ field }}',
+                'translation_domain'=>'{{ route_name_prefix }}',
+                'required'=>true
+            ))    
+            {% else %}
+            ->add('{{ field }}', '{% if field == 'email' %}email{% else %}text{% endif %}', array(
+                'label'=>'{{ route_name_prefix }}.form.{{ field }}',
+                'translation_domain'=>'{{ route_name_prefix }}',
+                'required'=>true,
+                'attr'=>array(
+                    'placeholder'=>'{{ route_name_prefix }}.placeholders.{{ field }}'
+                    {% if field == 'postal' %}
+                    'attr'=>array(
+                        'class'=>'postal'
+                    )
+                    {% endif %}
+                )
+            ))
+            {% endif %}
         {%- endfor %}
 
         ;

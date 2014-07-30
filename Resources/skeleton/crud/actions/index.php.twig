@@ -6,7 +6,7 @@
      *
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
-     * @Route("/", name="{{ route_name_prefix }}")
+     * @Route("/list", name="{{ route_name_prefix }}")
      * @Method("GET")
      * @Template()
 {% endif %}
@@ -17,9 +17,10 @@
 {% endblock method_definition %}
     {
 {% block method_body %}
-        $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('{{ bundle }}:{{ entity }}')->findAll();
+        $entities = $this->em->getRepository('{{ bundle }}:{{ entity }}')->findBy(array('deleted'=>false));
+        
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.home", array(), 'messages'), $this->generateUrl("{{ route_name_prefix }}_home"));
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.CHANGE",  array(), 'CHANGE'), $this->generateUrl("{{ route_name_prefix }}_CHANGE"));
 {% endblock method_body %}
 
 {% block method_return %}

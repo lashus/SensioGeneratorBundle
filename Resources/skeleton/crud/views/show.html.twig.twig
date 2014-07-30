@@ -3,10 +3,12 @@
 {% endblock extends %}
 
 {% block body %}
+{{ "{% trans_default_domain " ~ route_name_prefix ~ " %}" }}
+    
 {{ "{% block body -%}" }}
-    <h1>{{ entity }}</h1>
+    <h1>{{ '\{\{' ~ route_name_prefix ~ '.show.title\|trans\}\}' }}</h1>
 
-    <table class="record_properties">
+    <table class="table table-hover table-striped table-bordered table-responsive">
         <tbody>
         {%- for field, metadata in fields %}
 

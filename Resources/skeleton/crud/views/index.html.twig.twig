@@ -3,19 +3,21 @@
 {% endblock extends %}
 
 {% block body %}
+{{ "{% trans_default_domain " ~ route_name_prefix ~ " %}" }}
+    
 {{ "{% block body -%}" }}
-    <h1>{{ entity }} list</h1>
+    <h1>{{ '\{\{' ~ route_name_prefix ~ '.index.title\|trans\}\}' }}</h1>
 
-    <table class="records_list">
+    <table class="table table-striped table-hover table-bordered table-responsive">
         <thead>
             <tr>
             {%- for field, metadata in fields %}
 
-                <th>{{ field|capitalize }}</th>
+                <th>{{ "\{\{ '" ~ route_name_prefix ~ "entity." ~ field ~ "'|trans \}\}" }}</th>
 
             {%- endfor %}
 
-                <th>Actions</th>
+                <th>{{ "\{\{ 'global.actions'|trans(\{\}, 'messages') \}\}" }}</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +33,8 @@
 
                 <td>{{ '{% if entity.' ~ field|replace({'_': ''}) ~ ' %}{{ entity.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d H:i:s\') }}{% endif %}' }}</td>
 
+            {%- elseif metadata.type in ['boolean'] %}
+                <td>{{ '{% if entity.' ~ field|replace({'_': ''}) ~ ' %}<img src="\{\{ asset(\'\/webicons\/accept.png\') \}\}" />{% else %}<img src="\{\{ asset(\'\/webicons\/cancel.png\') \}\}" />{% endif %}' }}</td>
             {%- else %}
 
                 <td>{{ '{{ entity.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
@@ -52,10 +56,10 @@
     </table>
 
     {% if 'new' in actions %}
-    <ul>
+    <ul class='list list-unstyled'>
         <li>
-            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}">
-                Create a new entry
+            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}" class="btn btn-primary">
+                {{ "\{\{ 'global.new'|trans(\{\}, 'messages') \}\}" }}
             </a>
         </li>
     </ul>

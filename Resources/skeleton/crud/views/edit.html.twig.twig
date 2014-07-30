@@ -3,12 +3,13 @@
 {% endblock extends %}
 
 {% block body %}
+{{ "{% trans_default_domain " ~ route_name_prefix ~ " %}" }}
+    
 {{ "{% block body -%}" }}
-    <h1>{{ entity }} edit</h1>
+    <h1>{{ '\{\{' ~ route_name_prefix ~ '.edit.title\|trans\}\}' }}</h1>
 
-    {{ '{{ form(edit_form) }}' }}
+    {{ '\{\{ form(edit_form) \}\}' }}
 
     {% set hide_edit, hide_delete = true, false %}
-    {% include 'crud/views/others/record_actions.html.twig.twig' %}
 {{ "{% endblock %}" }}
 {% endblock body %}

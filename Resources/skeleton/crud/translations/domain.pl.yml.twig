@@ -1,0 +1,50 @@
+{{ route_name_prefix }}:
+{% if 'index' in actions %}
+    index:
+        title: Lista {{ route_name_prefix }}
+        subtitle: Lista {{ route_name_prefix }}
+        description: Lista {{ route_name_prefix }}
+
+{% endif %}
+
+{% if 'show' in actions %}
+    show:
+        title: Podgląd {{ route_name_prefix }}
+        subtitle: Podgląd {{ route_name_prefix }}
+        description: Podgląd {{ route_name_prefix }}
+{% endif %}
+
+{% if 'new' in actions %}
+    new:
+        title: Dodajesz {{ route_name_prefix }}
+        subtitle: Dodajesz {{ route_name_prefix }}
+        description: Dodajesz {{ route_name_prefix }}
+{% endif %}
+
+{% if 'edit' in actions %}
+    edit:
+        title: Edytujesz {{ route_name_prefix }}
+        subtitle: Edytujesz {{ route_name_prefix }}
+        description: Edytujesz {{ route_name_prefix }}
+{% endif %}
+
+    form:
+        {%- for field, metadata in fields %}
+
+        {{ field }}: {{ field }}
+
+        {%- endfor %}
+        
+    entity:
+        {%- for field, metadata in fields %}
+
+        {{ field }}: {{ field }}
+
+        {%- endfor %}
+        
+    placeholders:
+        {%- for field, metadata in fields %}
+        {% if metadata.type == 'text' or metadata.type == 'string' %}
+        {{ field }}: {{ field }}
+        {% endif %}
+        {% endfor %}

@@ -1,12 +1,14 @@
 
-                <ul>
-
-                {%- for action in record_actions %}
-
+                <ul class="list list-unstyled list-inline">
+                    {%- for action in record_actions %}
+                    {% if action == 'delete '%}
                     <li>
-                        <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { 'id': entity."~ identifier ~" }) }}" }}">{{ action }}</a>
+                    <a data-toggle="tooltip" title="{{ '\{\{ \'global.delete\'|trans \}\}' }}" class="btn btn-sm btn-danger removebutton" data-link="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { 'id': entity."~ identifier ~" }) }}" href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { 'id': entity."~ identifier ~" }) }}"><span class="fa fa-times fa-white"></span></a>
                     </li>
-
+                    {% else %}
+                    <li>
+                        <a data-toggle="tooltip" {{ 'global.edit'|trans }} class="btn btn-sm btn-primary" href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { 'id': entity."~ identifier ~" }) }}"><span class="fa fa-pencil fa-white"></span></a>
+                    </li>
+                    {% endif %}
                 {%- endfor %}
-
                 </ul>

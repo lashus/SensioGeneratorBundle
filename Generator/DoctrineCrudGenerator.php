@@ -130,6 +130,21 @@ class DoctrineCrudGenerator extends Generator
             strtolower(str_replace('\\', '_', $this->entity)),
             $this->format
         );
+        
+        $target_trans = sprintf(
+            '%s/Resources/config/translation/%s.pl.yml',
+            $this->bundle->getPath(),
+            $this->routeNamePrefix
+        );
+        
+        $this->renderFile('crud/translations/domain.pl.yml.twig', $target_trans, array(
+            'actions'           => $this->actions,
+            'route_prefix'      => $this->routePrefix,
+            'route_name_prefix' => $this->routeNamePrefix,
+            'bundle'            => $this->bundle->getName(),
+            'entity'            => $this->entity,
+            'fields'            => $this->metadata->fieldMappings,
+        ));
 
         $this->renderFile('crud/config/routing.'.$this->format.'.twig', $target, array(
             'actions'           => $this->actions,

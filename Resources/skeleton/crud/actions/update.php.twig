@@ -5,7 +5,7 @@
      *
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
-     * @Route("/{id}", name="{{ route_name_prefix }}_update")
+     * @Route("/update/{id}", name="{{ route_name_prefix }}_update")
      * @Method("PUT")
      * @Template("{{ bundle }}:{{ entity }}:edit.html.twig")
 {% endif %}
@@ -16,23 +16,36 @@
 {% endblock method_definition %}
     {
 {% block method_body %}
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('{{ bundle }}:{{ entity }}')->find($id);
+        
+        $entity = $this->em->getRepository('{{ bundle }}:{{ entity }}')->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find {{ entity }} entity.');
         }
+        
+        if (false === $this->security->isGranted('EDIT', $entity) AND
+            !$this->security->isGranted("ROLE_SUPER_ADMIN")) {
+            throw $this->createAccessDeniedException();
+        }
 
-        $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
+        
 
         if ($editForm->isValid()) {
-            $em->flush();
+            $this->em->flush();
 
+            $this->notify->crud('ajax-success', 'edit');
+            
             return $this->redirect($this->generateUrl('{{ route_name_prefix }}_edit', array('id' => $id)));
+        } else {
+            $this->notify->crud('ajax-error', 'edit');
         }
+        
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.home", array(), 'messages'), $this->generateUrl("{{ route_name_prefix }}_home"));
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.CHANGE",  array(), 'CHANGE'), $this->generateUrl("{{ route_name_prefix }}_CHANGE"));
+        $this->breadcrumbs->addItem($this->translator->trans("breadcrumbs.edit",  array(), 'messages'), $this->generateUrl("{{ route_name_prefix }}_edit", array('id'=>$id)));
+        
 {% endblock method_body %}
 
 {% block method_return %}
@@ -40,13 +53,11 @@
         return array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         );
 {% else %}
         return $this->render('{{ bundle }}:{{ entity|replace({'\\': '/'}) }}:edit.html.twig', array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         ));
 {% endif %}
 {% endblock method_return %}
